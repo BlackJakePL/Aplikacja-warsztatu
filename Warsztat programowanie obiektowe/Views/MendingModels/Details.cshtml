@@ -1,0 +1,51 @@
+﻿@model Warsztat_programowanie_obiektowe.Models.MendingModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>MendingModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MendingDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MendingDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MendingTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MendingTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VIN)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.VIN)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ID_worker)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ID_worker)
+        </dd>
+
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID_mending }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

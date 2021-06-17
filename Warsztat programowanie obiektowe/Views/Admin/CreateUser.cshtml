@@ -1,0 +1,38 @@
+﻿@model Warsztat_programowanie_obiektowe.ViewModel.WorkshopViewModel 
+@{
+    ViewBag.Title = "CreateUser";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Dodaj uzytkownika</h2>
+
+@{ 
+
+    var roles = Model.roles;
+    var selectRoles = new SelectList(roles,"","Name");
+   
+}
+
+@using (Html.BeginForm("CreateUser", "Admin", FormMethod.Post))
+{
+<div class="row">
+    <div class="col-md-4">
+        <label class="control-label">Email</label>
+        <input type="text" name="txtEmail" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label class="control-label">Hasło</label>
+        <input type="text" name="txtPwd" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label class="control-label">Rola</label>
+        @Html.DropDownList("roles",selectRoles, String.Empty)
+    </div>
+</div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" value="Dodaj" class="btn btn-primary">Zapisz</button>
+        </div>
+    </div>
+}

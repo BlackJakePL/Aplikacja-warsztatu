@@ -1,0 +1,273 @@
+﻿@model Warsztat_programowanie_obiektowe.Models.IndexViewModel
+@using System,
+@using Microsoft.AspNet.Identity.EntityFramework,
+@using Microsoft.AspNet.Identity,
+@using Warsztat_programowanie_obiektowe.Models,
+@{
+    ViewBag.Title = "Zarządzaj";
+}
+
+<h2>@ViewBag.Title.</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+    <h4>Zmień ustawienia konta</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Hasło:</dt>
+        <dd>
+            [
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Zmień hasło", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Utwórz", "SetPassword")
+            }
+            ]
+        </dd>
+
+        @*
+        Numery telefonów mogą być używane jako drugi składnik w systemach uwierzytelniania dwuskładnikowego.
+
+         Zobacz <a href="https://go.microsoft.com/fwlink/?LinkId=403804">ten artykuł</a>,
+                    aby uzyskać szczegółowe informacje na temat konfigurowania tej aplikacji ASP.NET pod kątem obsługi uwierzytelniania dwuskładnikowego przy użyciu wiadomości SMS.
+
+         Usuń komentarz z następującego bloku po skonfigurowaniu uwierzytelniania dwuskładnikowego
+        *@
+
+
+        @{
+            ApplicationDbContext db = new ApplicationDbContext();
+
+            var listOfUsers = (from u in db.Users
+                               let query = (from ur in db.Set<IdentityUserRole>()
+                                            where ur.UserId.Equals(u.Id)
+                                            join r in db.Roles on ur.RoleId equals r.Id
+                                            select r.Name)
+                               select new UserRoleInfo() { User = u, Roles = query.ToList<string>() })
+                         .ToList();
+
+
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>());
+            var userRole = listOfUsers.Where(p => p.User.Id == User.Identity.GetUserId());
+
+
+
+            if (userRole.First().Roles.Contains("SuperAdmin"))
+            {
+                <dt>Dodaj role </dt>
+                <dd>
+                    @Html.ActionLink("Dodaj uzytkownika", "CreateUser","Admin")
+                </dd>
+                <dt>Pracownicy</dt>
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.workers.First().ID_worker)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.workers.First().FirstName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.workers.First().LastName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.workers.First().PhoneNo)
+                            </th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model.workers)
+                        {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID_worker)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LastName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PhoneNo)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", "WorkersModels", new { id = item.ID_worker }, "") |
+                            @Html.ActionLink("Details", "Details", "WorkersModels", new { id = item.ID_worker }, "") |
+                            @Html.ActionLink("Delete", "Delete", "WorkersModels", new { id = item.ID_worker }, "")
+                        </td>
+                    </tr>
+                        }
+
+                    </table>
+                    @Html.ActionLink("Dodaj pracownika", "Create", "WorkersModels")
+                </dd>
+                <dt> Naprawy </dt>
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().VIN)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().ID_worker)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingTime)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingState)
+                            </th>
+                        </tr>
+                        @foreach (var item in db.mendings)
+                        {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.VIN)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID_worker)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingState)
+                        </td>
+                    </tr>
+                        }
+                    </table>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            @Html.ActionLink("Dodaj Naprawe", "Create", "MendingModels")
+                        </div>
+                        <div class="col-md-4">
+                            @Html.ActionLink("Przegladaj naprawy ", "Index", "MendingModels")
+
+                        </div>
+                    </div>
+
+                </dd>
+
+
+            }
+            else
+            {
+
+
+                var cars = Model.cars.Where(p => p.ID_client == User.Identity.GetUserId());
+
+                <dt>Samochody:</dt>
+                <dd>
+
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.cars.First().Make)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.cars.First().Model)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.cars.First().Power)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.cars.First().Year)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.cars.First().fuel)
+                            </th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in cars)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Make)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Model)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Power)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Year)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.fuel)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", "CarModels", new { id = item.VIN }, "") |
+                                    @Html.ActionLink("Details", "Details", "CarModels", new { id = item.VIN }, "") |
+                                    @Html.ActionLink("Delete", "Delete", "CarModels", new { id = item.VIN }, "")
+                                  
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                    @Html.ActionLink("Dodaj auto", "Create", "CarModels")
+
+                </dd>
+                <dt>Naprawy:</dt>
+                var id = User.Identity.GetUserId();
+                var ownerCars = db.cars.Where(p => p.ID_client == id);
+                var mendings = db.mendings.Where(p => ownerCars.Any(q => q.VIN == p.VIN));
+
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().VIN)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().ID_worker)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingTime)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.mendings.First().MendingState)
+                            </th>
+                        </tr>
+                        @foreach (var item in mendings)
+                        {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.VIN)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID_worker)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MendingState)
+                        </td>
+                    </tr>
+                        }
+                    </table>
+                </dd>
+            }
+        }
+    </dl>
+</div>
